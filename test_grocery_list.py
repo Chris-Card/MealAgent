@@ -45,35 +45,35 @@ def test_generate_grocery_list():
         description="Test",
         servings=2,
         macro_profile=MacroProfile.HIGH_PROTEIN_LOW_CARB,
+        meal_type="high_protein",
         prep_time_min=10,
         cook_time_min=30,
         ingredients=[
             Ingredient(name="chicken breast", quantity=1.0, unit="lb", category="meat"),
             Ingredient(name="broccoli", quantity=2.0, unit="cups", category="produce"),
         ],
-        steps=[RecipeStep(order=1, instruction="Cook")]
+        steps=[RecipeStep(order=1, instruction="Cook")],
     )
-    
     recipe2 = Recipe(
         title="Test Meal 2",
         description="Test",
         servings=2,
         macro_profile=MacroProfile.HIGH_PROTEIN_LOW_CARB,
+        meal_type="high_protein",
         prep_time_min=10,
         cook_time_min=30,
         ingredients=[
-            Ingredient(name="Chicken Breast", quantity=0.5, unit="lbs", category="meat"),  # Should combine with recipe1
+            Ingredient(name="Chicken Breast", quantity=0.5, unit="lbs", category="meat"),
             Ingredient(name="carrots", quantity=1.0, unit="cup", category="produce"),
         ],
-        steps=[RecipeStep(order=1, instruction="Cook")]
+        steps=[RecipeStep(order=1, instruction="Cook")],
     )
-    
     plan = WeeklyPlan(
         meals=[
-            PlannedMeal(day=DayOfWeek.MONDAY, audience="adult", recipe=recipe1),
-            PlannedMeal(day=DayOfWeek.TUESDAY, audience="adult", recipe=recipe2),
+            PlannedMeal(day=DayOfWeek.MONDAY, audience="adult", meal_type="high_protein", recipe=recipe1),
+            PlannedMeal(day=DayOfWeek.TUESDAY, audience="adult", meal_type="high_protein", recipe=recipe2),
         ],
-        week_of=date.today()
+        week_of=date.today(),
     )
     
     grocery_list = generate_grocery_list(plan, Config)
@@ -100,6 +100,7 @@ def test_grocery_list_sorting():
         description="Test",
         servings=2,
         macro_profile=MacroProfile.HIGH_PROTEIN_LOW_CARB,
+        meal_type="high_protein",
         prep_time_min=10,
         cook_time_min=30,
         ingredients=[
@@ -107,12 +108,11 @@ def test_grocery_list_sorting():
             Ingredient(name="chicken", quantity=1.0, unit="lb", category="meat"),
             Ingredient(name="apples", quantity=2.0, unit="pieces", category="produce"),
         ],
-        steps=[RecipeStep(order=1, instruction="Cook")]
+        steps=[RecipeStep(order=1, instruction="Cook")],
     )
-    
     plan = WeeklyPlan(
-        meals=[PlannedMeal(day=DayOfWeek.MONDAY, audience="adult", recipe=recipe)],
-        week_of=date.today()
+        meals=[PlannedMeal(day=DayOfWeek.MONDAY, audience="adult", meal_type="high_protein", recipe=recipe)],
+        week_of=date.today(),
     )
     
     grocery_list = generate_grocery_list(plan, Config)

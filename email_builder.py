@@ -1,6 +1,6 @@
 """Email content building and formatting."""
 from datetime import date
-from models import WeeklyPlan, Ingredient, DayOfWeek
+from models import WeeklyPlan, Ingredient, DayOfWeek, get_all_days_order, get_meal_type_label
 from grocery_list import format_grocery_list_for_display
 
 
@@ -66,14 +66,14 @@ def _build_html_email(plan: WeeklyPlan, grocery_list: list[Ingredient]) -> str:
     html_parts.append('<h2>Weekly Overview</h2>')
     html_parts.append('<div style="margin-bottom: 30px;">')
     
-    day_order = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY]
+    day_order = get_all_days_order()
     for day in day_order:
         meal = plan.get_meal_for_day(day)
         if meal:
             badge_class = "badge-adult" if meal.audience == "adult" else "badge-kids"
-            badge_text = "Adult • High Protein / Low Carb" if meal.audience == "adult" else "Kids • Kid-Friendly"
-            macro_desc = "High Protein / Low Carb" if meal.audience == "adult" else "Kid-Friendly"
-            
+            meal_label = get_meal_type_label(meal.meal_type)
+            badge_text = f"{meal_label}" + (f" • {meal.audience}" if meal.audience else "")
+
             html_parts.append(f"""
             <div class="meal-card">
                 <div class="meal-header">
@@ -97,8 +97,8 @@ def _build_html_email(plan: WeeklyPlan, grocery_list: list[Ingredient]) -> str:
         meal = plan.get_meal_for_day(day)
         if meal:
             badge_class = "badge-adult" if meal.audience == "adult" else "badge-kids"
-            badge_text = "Adult • High Protein / Low Carb" if meal.audience == "adult" else "Kids • Kid-Friendly"
-            
+            badge_text = get_meal_type_label(meal.meal_type) + (f" • {meal.audience}" if meal.audience else "")
+
             html_parts.append(f"""
             <div class="meal-card">
                 <div class="meal-header">
@@ -179,11 +179,11 @@ def _build_text_email(plan: WeeklyPlan, grocery_list: list[Ingredient]) -> str:
     lines.append("-" * 80)
     lines.append("")
     
-    day_order = [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY]
+    day_order = get_all_days_order()
     for day in day_order:
         meal = plan.get_meal_for_day(day)
         if meal:
-            audience_label = "Adult • High Protein / Low Carb" if meal.audience == "adult" else "Kids • Kid-Friendly"
+            audience_label = get_meal_type_label(meal.meal_type) + (f" • {meal.audience}" if meal.audience else "")
             lines.append(f"{day.value.title()}: {meal.recipe.title}")
             lines.append(f"  {audience_label}")
             lines.append(f"  Time: {meal.recipe.total_time_min} min ({meal.recipe.prep_time_min} prep + {meal.recipe.cook_time_min} cook)")
@@ -200,7 +200,7 @@ def _build_text_email(plan: WeeklyPlan, grocery_list: list[Ingredient]) -> str:
     for day in day_order:
         meal = plan.get_meal_for_day(day)
         if meal:
-            audience_label = "Adult • High Protein / Low Carb" if meal.audience == "adult" else "Kids • Kid-Friendly"
+            audience_label = get_meal_type_label(meal.meal_type) + (f" • {meal.audience}" if meal.audience else "")
             lines.append(f"{day.value.title()}: {meal.recipe.title}")
             lines.append(f"[{audience_label}]")
             lines.append("-" * 80)

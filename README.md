@@ -1,10 +1,12 @@
 # Weekly Dinner Planning AI Agent
 
-An AI-powered agent that generates weekly dinner meal plans (Monday through Thursday) tailored to your family's needs, complete with recipes, cooking instructions, and a consolidated grocery list.
+An AI-powered agent that generates weekly dinner meal plans for **all seven days** (Monday–Sunday), tailored to your family's dietary preferences and allergies, with recipes, cooking instructions, and a consolidated grocery list.
 
 ## Features
 
-- **Smart Meal Planning**: Monday & Tuesday meals are optimized for adult palates with high protein and low carbs. Wednesday & Thursday meals are kid-friendly with more relaxed macro composition.
+- **Full Week Planning**: Dinners for Monday through Sunday with a mix of meal types you choose.
+- **Dietary Preferences**: Configure meal types to include (e.g. High Protein, Gluten Free, Vegetarian, Kid Friendly, Vegan, Low Carb, Dairy Free, Nut Free, Balanced). The planner distributes these across the week.
+- **Allergies & Avoidances**: List ingredients or allergens to avoid (e.g. shellfish, peanuts, tree_nuts); recipes will exclude them.
 - **Complete Recipes**: Each meal includes detailed ingredients and step-by-step cooking instructions.
 - **Grocery List**: Automatically aggregates all ingredients across the week into a single, organized shopping list.
 - **Email Delivery**: Sends the complete meal plan directly to your email inbox every Monday.
@@ -40,6 +42,12 @@ An AI-powered agent that generates weekly dinner meal plans (Monday through Thur
    ADULT_SERVINGS=2
    CHILD_SERVINGS=2
    LEFTOVERS_FACTOR=1.3
+
+   # Dietary Preferences (comma-separated)
+   # Meal types to include across the week: high_protein, gluten_free, vegetarian, vegan, kid_friendly, low_carb, dairy_free, nut_free, balanced
+   MEAL_TYPES=high_protein,vegetarian,kid_friendly,balanced
+   # Ingredients/allergens to never use (e.g. shellfish, peanuts, tree_nuts)
+   ALLERGIES_AVOID=
 
    # Optional LLM Configuration
    LLM_TEMPERATURE=0.7
@@ -150,6 +158,8 @@ All configuration is managed through environment variables in your `.env` file. 
 - **ADULT_SERVINGS**: Number of servings for Monday/Tuesday meals (default: 2)
 - **CHILD_SERVINGS**: Number of servings for Wednesday/Thursday meals (default: 2)
 - **LEFTOVERS_FACTOR**: Multiplier for leftovers (1.3 = 30% extra, default: 1.3)
+- **MEAL_TYPES**: Comma-separated meal types to include (e.g. `high_protein,vegetarian,kid_friendly,balanced`). Default: high_protein, vegetarian, kid_friendly, balanced.
+- **ALLERGIES_AVOID**: Comma-separated ingredients or allergens to never use (e.g. `shellfish,peanuts,tree_nuts`). Leave empty if none.
 - **LLM_TEMPERATURE**: Creativity level (0.0-2.0, default: 0.7)
 
 ## Project Structure
@@ -182,7 +192,7 @@ python test_grocery_list.py
 - Verify your `ANTHROPIC_API_KEY` is valid and has credits
 - Check your internet connection
 - Try a different model name (e.g., `claude-3-5-haiku-latest`, `claude-3-5-sonnet-latest`, or `claude-haiku-4-5`)
-- Increase `LLM_MAX_TOKENS` if recipes are being cut off
+- Increase `LLM_MAX_TOKENS` if recipes are being cut off (e.g. 8000 for 7-day plans)
 
 ### Plan Validation Errors
 - The agent validates that Monday/Tuesday are adult-focused and Wednesday/Thursday are kid-focused
@@ -191,12 +201,12 @@ python test_grocery_list.py
 
 ## How It Works
 
-1. **Meal Planning**: Uses Anthropic's Claude API to generate a weekly meal plan with 4 recipes (Mon-Thu)
-2. **Macro Optimization**: Monday/Tuesday focus on high protein, low carbs for adults
-3. **Kid-Friendly Meals**: Wednesday/Thursday focus on familiar, kid-friendly flavors
-4. **Grocery Aggregation**: Combines ingredients across all meals, normalizing units and quantities
-5. **Email Formatting**: Creates both HTML and plain text versions of the meal plan
-6. **Email Delivery**: Sends via Gmail SMTP with automatic retries on failure
+1. **Meal Planning**: Uses Anthropic's Claude API to generate a 7-day dinner plan (Monday–Sunday).
+2. **Dietary Mix**: Each day is assigned a meal type from your MEAL_TYPES list (e.g. High Protein, Vegetarian, Kid Friendly), with variety across the week.
+3. **Allergy Safety**: No recipe includes any ingredient from your ALLERGIES_AVOID list.
+4. **Grocery Aggregation**: Combines ingredients across all meals, normalizing units and quantities.
+5. **Email Formatting**: Creates both HTML and plain text versions of the meal plan.
+6. **Email Delivery**: Sends via Gmail SMTP with automatic retries on failure.
 
 ## License
 

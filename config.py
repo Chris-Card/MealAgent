@@ -6,6 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _parse_comma_list(value: str) -> list[str]:
+    """Parse comma-separated env value into list of stripped, non-empty strings."""
+    if not value or not value.strip():
+        return []
+    return [s.strip() for s in value.split(",") if s.strip()]
+
+
 class Config:
     """Central configuration class for the meal planning agent."""
     
@@ -20,12 +27,17 @@ class Config:
     ADULT_SERVINGS: int = int(os.getenv("ADULT_SERVINGS", "2"))
     CHILD_SERVINGS: int = int(os.getenv("CHILD_SERVINGS", "2"))
     LEFTOVERS_FACTOR: float = float(os.getenv("LEFTOVERS_FACTOR", "1.3"))  # 30% extra for leftovers
-    
+
+    # Dietary preferences: meal types to include across the week (e.g. high_protein, vegetarian, kid_friendly)
+    MEAL_TYPES: list[str] = _parse_comma_list(os.getenv("MEAL_TYPES", "high_protein,vegetarian,kid_friendly,balanced"))
+    # Ingredients/allergens to never use (e.g. shellfish, peanuts, tree_nuts)
+    ALLERGIES_AVOID: list[str] = _parse_comma_list(os.getenv("ALLERGIES_AVOID", ""))
+
     # LLM configuration (Claude / Anthropic)
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     MODEL_NAME: str = os.getenv("MODEL_NAME", "claude-3-5-haiku-latest")
     LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.7"))
-    LLM_MAX_TOKENS: int = int(os.getenv("LLM_MAX_TOKENS", "4000"))
+    LLM_MAX_TOKENS: int = int(os.getenv("LLM_MAX_TOKENS", "16384"))
     
     # Behavior configuration
     RUN_DAY: str = os.getenv("RUN_DAY", "MONDAY")
